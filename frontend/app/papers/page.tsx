@@ -1,0 +1,3 @@
+"use client";
+import {usePapers,Heading,UploadPanel,PapersTable,Loading} from "@/components/ui";
+export default function Papers(){const {papers,loading,error,refresh}=usePapers();return <><Heading eyebrow="Your collection" title="Paper library" description="Upload academic PDFs to extract page-aware text and index them for research."/><UploadPanel onDone={refresh}/><div className="mb-3 mt-8 flex items-center justify-between"><h2 className="font-bold">Your papers <span className="ml-1 text-sm font-normal text-muted">{papers.length}</span></h2></div>{loading?<Loading/>:error?<p className="text-sm text-red-700">{error}</p>:<PapersTable papers={papers} refresh={refresh}/>}</>}
