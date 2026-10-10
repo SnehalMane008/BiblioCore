@@ -6,14 +6,14 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
-  Activity, BookOpen, Bot, ChartNoAxesCombined, FlaskConical, LayoutDashboard,
-  Library, LogOut, Menu, Search, Settings, Sparkles, X,
+  Activity, BookOpen, Bot, ChartNoAxesCombined, ChartNoAxesColumnIncreasing, FlaskConical, LayoutDashboard,
+  Library, LogOut, Menu, Search, Sparkles, X,
 } from "lucide-react";
 
 const groups = [
   { name: "Workspace", links: [["/dashboard", "Overview", LayoutDashboard], ["/papers", "Paper library", Library], ["/chat", "Research assistant", Bot], ["/search", "Semantic search", Search]] as const },
-  { name: "Research tools", links: [["/compare", "Compare papers", ChartNoAxesCombined], ["/literature-review", "Literature review", BookOpen], ["/research-gaps", "Research gaps", FlaskConical], ["/evaluation", "RAG evaluation", Activity]] as const },
-  { name: "Learn", links: [["/about", "How it works", Sparkles], ["/settings", "Settings", Settings]] as const },
+  { name: "Research tools", links: [["/compare", "Compare papers", ChartNoAxesCombined], ["/analytics", "Paper analytics", ChartNoAxesColumnIncreasing], ["/literature-review", "Literature review", BookOpen], ["/research-gaps", "Research gaps", FlaskConical], ["/evaluation", "RAG evaluation", Activity]] as const },
+  { name: "Learn", links: [["/about", "How it works", Sparkles]] as const },
 ];
 
 export function Shell({ children }: { children: React.ReactNode }) {
@@ -73,6 +73,20 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <div className="flex shrink-0 items-center gap-2"><ThemeToggle /><Link href="/papers" className="rounded-xl bg-blue px-3.5 py-2.5 text-sm font-bold text-white sm:px-4">+ <span className="hidden sm:inline">Add papers</span><span className="sm:hidden">Add</span></Link></div>
       </header>
       <main className="workspace-canvas mx-auto min-h-[calc(100vh-72px)] w-full max-w-[1440px] p-4 sm:p-6 lg:p-9">{children}</main>
+      <footer className="border-t border-line bg-white/75 px-4 py-5 sm:px-6 lg:px-9">
+        <div className="mx-auto flex max-w-[1440px] flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <span className="text-xs text-muted">© {new Date().getFullYear()} BiblioCore. All rights reserved.</span>
+          <nav aria-label="Workspace footer navigation" className="flex flex-wrap gap-x-5 gap-y-2 text-xs font-medium text-muted">
+            <Link href="/about" className="hover:text-blue">About</Link>
+            <Link href="/papers" className="hover:text-blue">Paper library</Link>
+            <Link href="/chat" className="hover:text-blue">Research assistant</Link>
+            <Link href="/compare" className="hover:text-blue">Compare papers</Link>
+            <Link href="/analytics" className="hover:text-blue">Paper analytics</Link>
+            <Link href="/literature-review" className="hover:text-blue">Literature review</Link>
+            <Link href="/research-gaps" className="hover:text-blue">Research gaps</Link>
+          </nav>
+        </div>
+      </footer>
     </div>
   </div>;
 }

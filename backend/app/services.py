@@ -370,6 +370,15 @@ def _missing_paper_row(name: str) -> dict[str, str]:
             "results": missing, "limitations": missing, "future_work": missing}
 
 
+def _limit_words(value: Any, max_words: int) -> str:
+    """Keep generated comparison cells readable even when the model ignores its prompt."""
+    text = _as_text(value).strip()
+    words = text.split()
+    if len(words) <= max_words:
+        return text
+    return " ".join(words[:max_words]).rstrip(" ,;:") + "…"
+
+
 def normalize_structured_generation(raw: str, kind: str, paper_names: list[str] | None = None) -> dict[str, Any]:
     """Validate model output and return a paper-per-row research matrix."""
     paper_names = paper_names or []
@@ -487,6 +496,11 @@ def normalize_structured_generation(raw: str, kind: str, paper_names: list[str] 
                 row.setdefault("confidence", "Low")
 
     if kind == "comparison":
+        comparison_fields = ("research_problem", "methods", "data", "results", "limitations", "future_work")
+        for row in rows:
+            for field in comparison_fields:
+                row[field] = _limit_words(row.get(field, ""), 18)
+        summary = _limit_words(summary, 35)
         return ComparisonResult.model_validate({"rows": rows, "overall_synthesis": summary}).model_dump()
     return ResearchGapResult.model_validate({"rows": rows, "overall_synthesis": summary}).model_dump()
 

@@ -14,6 +14,7 @@ from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
 from app.config import settings
+from app.analytics import build_library_analytics
 from app.database import Base, SessionLocal, engine
 from app.models import Analysis, Chat, Message, Paper, User
 from app.schemas import (ChatRequest, CompareRequest, GenerationRequest, LoginRequest, PaperOut,
@@ -328,7 +329,9 @@ def compare(payload: CompareRequest, user: User = Depends(current_user), db: Ses
             '"overall_synthesis":"Brief synthesis across the selected studies."}. '
             "Return exactly one row for EVERY selected filename, in the same order as listed. The table has one paper per row "
             "and these six comparison columns: research_problem, methods, data, results, limitations, future_work. Each cell "
-            "must describe that paper only, in 1–3 concise sentences. Never combine two papers in one row. If the retrieved "
+            "must be a short phrase or one sentence of at most 18 words. State only the key point; do not add background, "
+            "explanation, examples, or repeated details. Keep overall_synthesis to at most 35 words. Never combine two papers "
+            "in one row. If the retrieved "
             "excerpts do not identify a detail for a paper, write exactly 'Not identified in the retrieved excerpts.' in that "
             "cell. Use only the supplied passages. Do not add markdown, code fences, extra keys, prose outside JSON, invented "
             "facts, or citations.")
@@ -386,9 +389,21 @@ def research_gaps(payload: GenerationRequest, user: User = Depends(current_user)
 def dashboard(user: User = Depends(current_user), db: Session = Depends(get_db)):
     papers = list(db.scalars(select(Paper).where(Paper.owner_id == user.id).order_by(Paper.created_at.desc())))
     chats = list(db.scalars(select(Chat).where(Chat.owner_id == user.id).order_by(Chat.created_at.desc()).limit(5)))
-    return {"total_papers": len(papers), "indexed_papers": sum(p.status == "indexed" for p in papers),
+    return {"name": user.name, "total_papers": len(papers), "indexed_papers": sum(p.status == "indexed" for p in papers),
             "processing_papers": sum(p.status == "processing" for p in papers), "recent_papers": [paper_out(p) for p in papers[:5]],
             "recent_chats": [{"id": c.id, "title": c.title} for c in chats]}
+
+
+@app.get("/api/analytics")
+def library_analytics(user: User = Depends(current_user), db: Session = Depends(get_db)):
+    papers = list(db.scalars(select(Paper).where(Paper.owner_id == user.id).order_by(Paper.created_at.desc())))
+    try:
+        return build_library_analytics(papers)
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from exc
+    except Exception as exc:
+        logger.exception("Could not calculate library analytics")
+        raise HTTPException(503, "Paper analytics are temporarily unavailable.") from exc
 
 
 @app.get("/api/papers/{paper_id}/export")

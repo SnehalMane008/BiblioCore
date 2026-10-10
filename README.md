@@ -33,6 +33,7 @@ BiblioCore turns research PDFs into searchable, page-linked evidence. Ask questi
 - **Literature review drafts:** Synthesize retrieved evidence from selected papers with inline filename and page references.
 - **Semantic search:** Find relevant passages by meaning and inspect the exact retrieved excerpt.
 - **Research dashboard:** View library activity, paper page counts, and evidence coverage for comparison results.
+- **Paper analytics:** Explore extracted keywords, reference-year patterns, links and author overlap within your uploaded library, plus text complexity and saved methodology details. External citation impact, field benchmarks, tone, and topic shares are marked unavailable when the PDFs cannot establish them.
 - **Accounts and themes:** Use a private account with isolated paper and chat data; switch between light and dark themes.
 
 ## How it works
@@ -161,7 +162,7 @@ All application routes are under `/api`; the full schema is available in FastAPI
 | `/api/chat`, `/api/chats` | Grounded question answering and conversation history. |
 | `/api/search` | Semantic passage search. |
 | `/api/compare`, `/api/literature-review`, `/api/research-gaps` | Multi-paper synthesis endpoints. |
-| `/api/dashboard`, `/api/evaluation/*` | Workspace overview and retrieval evaluation. |
+| `/api/dashboard`, `/api/analytics`, `/api/evaluation/*` | Workspace overview, PDF-derived analytics, and retrieval evaluation. |
 
 All paper and conversation operations are scoped to the signed-in account. Comparison and research-gap responses use structured rows with one row per selected paper; see [API documentation](docs/api-documentation.md) for response fields.
 
